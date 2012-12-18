@@ -158,38 +158,38 @@ let private findByLabel locator f =
     with
         | _ -> null
 
-let findElement cssSelector =
+let private findElement selector =
     try
-        let cssResult = findByCss cssSelector browser.FindElement
+        let cssResult = findByCss selector browser.FindElement
         if cssResult <> null then
             cssResult
         else
-            findByLabel cssSelector browser.FindElement
+            findByLabel selector browser.FindElement
     with
         | _ -> null
 
-let findElements cssSelector =
+let private findElements selector =
     try
-        findByCss cssSelector browser.FindElements
+        findByCss selector browser.FindElements
     with
         | _ -> null
 
-let private findByFunction cssSelector timeout waitFunc =
-    if wipTest then colorizeAndSleep cssSelector    
+let private findByFunction selector timeout waitFunc =
+    if wipTest then colorizeAndSleep selector    
     let wait = new WebDriverWait(browser, TimeSpan.FromSeconds(elementTimeout))
     try
-        wait.Until(fun _ -> waitFunc cssSelector)
+        wait.Until(fun _ -> waitFunc selector)
     with
         | :? System.TimeoutException -> puts "Element not found in the allotted time. If you want to increase the time, put elementTimeout <- 10.0 anywhere before a test to increase the timeout"
-                                        suggestOtherSelectors cssSelector
-                                        failwith (String.Format("cant find element {0}", cssSelector))
+                                        suggestOtherSelectors selector
+                                        failwith (String.Format("cant find element {0}", selector))
         | ex -> failwith ex.Message
 
-let private find cssSelector timeout =
-    findByFunction cssSelector timeout findElement
+let private find selector timeout =
+    findByFunction selector timeout findElement
 
-let private findMany cssSelector timeout =
-    Seq.toList (findByFunction cssSelector timeout findElements)
+let private findMany selector timeout =
+    Seq.toList (findByFunction selector timeout findElements)
     
 let currentUrl _ =
     browser.Url
